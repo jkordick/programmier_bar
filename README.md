@@ -3,6 +3,9 @@
 > Repository initially created by Julia Kordick for the programmier.bar meetup on 2026-04-09
 > May contain traces of eggs, humor and examples
 
+## Agentic SDLC scenarios
+### 1. PR Review
+
 A demo project featuring a **Java Spring Boot** REST API and a **React + TypeScript** frontend with a space-themed UI.
 
 ## What is this?

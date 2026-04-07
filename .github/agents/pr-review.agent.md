@@ -53,6 +53,26 @@ Using the detected MCP server, fetch and assemble the following PR context into 
 
 If any data point fails to fetch, log a warning but continue — partial context is acceptable.
 
+**Linked issue resolution (mandatory attempt):**
+
+Use ALL of the following strategies in order. Stop as soon as at least one issue is found, but always attempt strategies 1–3:
+
+1. **MCP PR metadata fields**: When reading the PR via MCP, inspect the full response for any fields indicating linked or closing issues (e.g., `closingIssuesReferences`, `linked_issues`, `body` references). MCP tools may embed linked issue data directly — do not ignore any fields.
+2. **PR body text scan**: Parse the PR description for issue references — `#<number>`, `Fixes #<number>`, `Closes #<number>`, `Resolves #<number>`, full issue URLs (`https://github.com/<owner>/<repo>/issues/<number>`).
+3. **MCP issue search (critical — most reliable for sidebar-linked issues)**: Use the MCP issue/PR search tool (e.g., `github_search_issues` or `github_search_pull_requests`) to search for issues that reference this PR. Search queries to try:
+   - `repo:<owner>/<repo> linked:pr` or equivalent to find issues linked to PRs.
+   - `repo:<owner>/<repo> is:issue` — then for each recent open/closed issue, check if the PR number appears in its timeline or linked PRs.
+   - Search the repo issues for keywords from the PR title (e.g., if the PR is "Add Mission Log", search for issues containing "Mission Log" or "mission").
+4. **Branch name heuristic**: Parse the source branch name for issue references (e.g., `feature/42-add-login`, `issue-42`, `GH-42`). Extract the number and attempt to fetch that issue via MCP.
+5. **PR commit messages**: Scan commit messages in the PR for `#<number>`, `Fixes #`, `Closes #` patterns. Use MCP to list PR commits if available.
+6. **Repo issues list (fallback)**: If all above fail, use MCP to list recent open issues in the repository. Compare issue titles and descriptions against the PR title and description for semantic matches. If a strong match is found (>70% keyword overlap), suggest it as a likely linked issue and ask the reviewer to confirm.
+
+For each discovered issue, fetch its **full details** (title, description/body, acceptance criteria, labels, assignees, status) via the MCP issue read tool.
+
+- If **no linked issue or work item is found** after all strategies, display a prominent warning:
+  > ⚠️ **No linked issue or work item found for this PR.** This PR has no traceability to a requirement or user story. Consider linking an issue before merging.
+- This warning must appear in the PR overview and carry through to the final summary.
+
 Present a compact PR overview to the reviewer:
 
 ```
@@ -66,6 +86,7 @@ Files changed: <count> | Additions: +<n> | Deletions: -<n>
 ### Linked Work Items
 - #<issue>: <title> (status: <status>)
   Acceptance Criteria: <summarized AC if available>
+- ⚠️ No linked issue found. (if none discovered)
 
 ### Existing Reviews
 - <reviewer>: <state> (<approve/request-changes/comment>) — <summary of key points>
@@ -131,35 +152,61 @@ Load the referenced review taxonomy from [pr-review-taxonomy.md](../instructions
 ### Review Notes
 <Apply taxonomy categories from pr-review-taxonomy.md. Only surface findings, not clean categories:>
 - <category>: <finding> (severity: info|warning|concern)
+
+### Agent Guidance
+<Based on the review notes above, provide a concrete, actionable recommendation. Be opinionated — always look for at least one improvement opportunity, even if minor. Consider:>
+- Could types be more precise? (e.g., `Integer` vs `int`, `Optional` usage, stricter generics)
+- Are there missing validations, edge cases, or null checks?
+- Could naming, structure, or abstractions be improved?
+- Are there performance, security, or testability improvements available?
+- Could this code benefit from a pattern used elsewhere in the project?
+
+<Format the guidance as a ready-to-post review comment with a specific, implementable suggestion:>
+
+> **<severity emoji ℹ️/⚠️/🔴>** <concise, specific, constructive comment or code suggestion>
+
+<"No concerns" should be rare — reserve it ONLY when the code is genuinely exemplary. Even well-written code usually has at least one ℹ️-level suggestion. If you truly find nothing, state: "No actionable improvements identified — this is solid, well-structured code.">
 ```
 
 #### 5b. Present Options
 
-After the summary, present exactly these options:
+After the summary (which already includes agent guidance), present the options table. **Do NOT repeat or summarize the guidance content in the options table** — it is already visible above.
+
+**When agent guidance contains an actionable suggestion:**
 
 | Option | Action |
 |--------|--------|
-| **A** | **LGTM** — This change group looks good, no comments needed. |
-| **B** | **Agent Recommendation** — Let the agent draft a specific review comment or suggestion for this group. |
-| **C** | **Needs Discussion** — Flag for discussion (provide your concern in a short note; the agent will help formulate it or note it for the human review summary). |
-| **D** | **Skip** — Skip this group for now (agent may still note relevant observations). |
+| **A** | **LGTM** — Approved. |
+| **B** | **Apply Guidance** — Implement the suggestion above. (`B` or `B: <extra instructions>`) |
+| **C** | **Comment on PR** — Post a comment. (`C: <text>` or agent asks) |
+| **D** | **Skip (NACK)** — Not approved. |
 
-Reply with the option letter. For B, the agent will draft a comment and ask for approval before recording. For C, provide a brief concern after selecting.
+**When no actionable guidance exists (code is clean):**
+
+| Option | Action |
+|--------|--------|
+| **A** | **LGTM** — Approved. |
+| **B** | **Suggest Improvement** — Tell the agent what to change. (`B: <instructions>`) |
+| **C** | **Comment on PR** — Post a comment. (`C: <text>` or agent asks) |
+| **D** | **Skip (NACK)** — Not approved. |
+
+Reply with the option letter.
 
 #### 5c. Process the Response
 
 - **A (LGTM)**: Record as approved. Move to next group.
-- **B (Agent Recommendation)**: 
-  - Generate a constructive, specific review comment or code suggestion based on the taxonomy findings.
-  - Present the draft to the reviewer: "Here's my suggested comment: `<comment>`. Approve, edit, or discard?"
-  - If approved or edited, record the final comment mapped to the relevant file(s) and line(s).
-  - If discarded, record as LGTM and move on.
-- **C (Needs Discussion)**:
-  - Prompt: "What's your concern? (short note)"
-  - Help the reviewer formulate it into a clear, actionable review comment.
-  - Present the formulated comment for approval.
-  - Record the approved comment.
-- **D (Skip)**: Record as skipped. If the agent noticed notable findings, record them internally for the final summary but do not block progress.
+- **B (Apply Guidance)**:
+  - The agent **implements the guidance as actual code changes** in the project files (edit source code, add tests, fix issues, etc.).
+  - If the reviewer replied with just "B": apply the agent guidance from step 5a directly — make the code changes suggested.
+  - If the reviewer replied with "B: <additional instructions>": incorporate the reviewer's instructions alongside the agent guidance when implementing.
+  - After making the changes, show a brief summary of what was modified and confirm: "Applied. Files changed: `<list>`. Review the changes? (yes / move on)"
+  - If the implementation requires clarification, ask before proceeding.
+- **C (Comment on PR)**:
+  - If the reviewer provided a comment inline (`C: <text>`): format it as a clear PR review comment, confirm, and post.
+  - If the reviewer just said "C" without a comment: prompt — "What comment should I add to the PR?" Do NOT proceed until the reviewer provides a comment.
+  - Present the formatted comment for approval: "I'll post this: `<comment>`. OK? (yes / edit / discard)"
+  - Once posted, record and move to the next group.
+- **D (Skip / NACK)**: Record as **not approved**. No action taken. The change group is flagged as NACK in the final summary. Move to next group.
 
 After processing, move to the next group. Never reveal upcoming groups.
 
@@ -169,11 +216,61 @@ The reviewer may signal completion at any time:
 - "done", "stop", "approve all", "lgtm all" → Stop the loop; remaining groups are recorded as not reviewed.
 - "reject" or "request changes" → Stop the loop; skip to final summary with a request-changes posture.
 
-### 6. Final Summary & PR Comment
+### 6. Cross-Cutting Observations
 
-After all groups are reviewed (or early termination):
+After **all change groups** have been reviewed (or early termination), but **before** generating the final summary:
 
-#### 6a. Generate Summary
+#### 6a. Surface Observations
+
+Compile cross-cutting observations gathered during the review (e.g., missing tests, inconsistent patterns, security considerations, architectural concerns). Present them to the reviewer:
+
+```
+## Observations (cross-cutting)
+
+<numbered list of observations, e.g.:>
+1. No tests were included in this PR. Consider adding controller and integration tests.
+2. CORS is configured per-controller with hardcoded `localhost:5173` — consider centralizing via `WebMvcConfigurer`.
+3. No PUT/PATCH endpoint for updating missions — not required by the issue but may be a natural next step.
+```
+
+For each observation, offer the same options as the change group review:
+
+| Option | Action |
+|--------|--------|
+| **A** | **Acknowledged** — No action needed. |
+| **B** | **Apply** — Let the agent address this observation with code changes. Type `B` or `B: <instructions>`. |
+| **C** | **Comment on PR** — Add this as a PR comment. (`C: <text>` or agent asks.) |
+| **D** | **Skip** |
+
+Walk through observations one at a time, same interactive flow as step 5.
+
+If no cross-cutting observations exist, skip this step.
+
+#### 6b. Build & Test Verification
+
+After observations are processed, run the project's build and test suite to verify the current state (especially important if code changes were applied via option B during the review):
+
+- **Detect the build system** by inspecting the repository root and common locations:
+  - Java/Maven: `mvn clean verify` (or `./mvnw clean verify`)
+  - Java/Gradle: `gradle build` (or `./gradlew build`)
+  - Node.js: `npm test` or `npm run build` (check `package.json` scripts)
+  - Python: `pytest` or equivalent from config
+  - .NET: `dotnet build && dotnet test`
+  - If multiple projects exist (e.g., `backend/` + `frontend/`), run builds for each.
+- **If no build/test command can be determined**, ask the reviewer: "What command should I run to build and test?"
+- **Present the results**:
+  - ✅ Build & tests passed — proceed to summary.
+  - ❌ Build or tests failed — show the failure output and ask:
+    > "Build/tests failed. Would you like me to attempt to fix the issues? (yes / skip — I'll note the failure in the summary)"
+    - If yes: diagnose and fix, then re-run. Report the outcome.
+    - If skip: record the build failure in the final summary.
+- If **no code changes were applied** during the review (no B actions), still run the build/tests as a validation of the PR's current state and include the result in the summary.
+
+### 7. Final Summary & PR Comment
+
+After observations and build verification:
+
+#### 7a. Generate Summary
 
 ```
 ## Review Summary for PR #<number>
@@ -181,14 +278,25 @@ After all groups are reviewed (or early termination):
 ### Overall
 - Groups reviewed: <n>/<total>
 - LGTM: <count>
-- Comments/Suggestions: <count>
-- Needs Discussion: <count>
-- Skipped: <count>
+- Guidance applied (code changes): <count>
+- PR comments posted: <count>
+- NACK (skipped, not approved): <count>
 - Not reviewed (early termination): <count>
 
-### Comments
-<For each recorded comment:>
+### Build & Test Result
+- ✅ Passed / ❌ Failed (<details if failed>)
+
+### Code Changes Applied
+<For each B action (change groups + observations):>
+1. **<file(s)>** — <what was changed and why>
+
+### PR Comments Posted
+<For each C action:>
 1. **<file(s)>** — <comment summary>
+
+### NACK Items
+<For each D action:>
+1. **Change group: <label>** — Not approved (agent observations: <brief notes>)
 
 ### Acceptance Criteria Coverage
 <Aggregate AC status across all groups:>
@@ -197,17 +305,33 @@ After all groups are reviewed (or early termination):
 - ❌ Not met: <list>
 
 ### Observations
-<Any cross-cutting concerns noticed across groups, e.g., missing tests, inconsistent patterns, security considerations>
+<Cross-cutting concerns — only those NOT already addressed via B/C actions above:>
+- <observation>
 ```
 
-#### 6b. Offer to Post as PR Comment
+#### 7b. Offer to Post as PR Comment
 
 Ask: **"Would you like me to post this summary as a comment on PR #<number>? (yes/no)"**
 
 - If **yes**: Format the summary as a clean Markdown comment and post it via the MCP server's PR comment API. Confirm once posted.
 - If **no**: Display the summary for the reviewer to use manually. Suggest copying it.
 
-### 7. Completion
+#### 7c. Offer to Push Changes
+
+Only if code changes were applied during the review (any B actions in steps 5 or 6):
+
+Ask: **"Code changes were made during this review. Would you like me to commit and push them to the PR branch? (yes/no)"**
+
+- If **yes**:
+  - Stage all modified files.
+  - Commit with a descriptive message: `review: apply review feedback for PR #<number>` (include a brief summary of changes in the commit body).
+  - Push to the PR's source branch.
+  - Confirm once pushed: "Changes pushed to `<branch>`."
+- If **no**: Inform the reviewer that uncommitted changes remain in the working tree and they can commit/push manually when ready.
+
+If no code changes were applied during the review, skip this step entirely.
+
+### 8. Completion
 
 Report:
 - PR number reviewed.
