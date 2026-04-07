@@ -1,19 +1,23 @@
 package dev.spacedevs.config;
 
+import dev.spacedevs.model.Mission;
+import dev.spacedevs.model.MissionStatus;
 import dev.spacedevs.model.Seniority;
 import dev.spacedevs.model.SpaceDeveloper;
+import dev.spacedevs.repository.MissionRepository;
 import dev.spacedevs.repository.SpaceDeveloperRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Configuration
 public class DataSeeder {
 
     @Bean
-    CommandLineRunner seedData(SpaceDeveloperRepository repo) {
+    CommandLineRunner seedData(SpaceDeveloperRepository repo, MissionRepository missionRepo) {
         return args -> {
             var dev1 = new SpaceDeveloper();
             dev1.setCallSign("NebulaNinja");
@@ -192,6 +196,57 @@ public class DataSeeder {
             dev11.setShipName("The Prompt Injector");
 
             repo.saveAll(List.of(dev1, dev2, dev3, dev4, dev5, dev6, dev7, dev8, dev9, dev10, dev11));
+
+            // Seed sample missions
+            var m1 = new Mission();
+            m1.setTitle("Deploy Nebula ORM v2.0");
+            m1.setDescription("Launched the next-gen ORM across the Andromeda cluster.");
+            m1.setDate(LocalDate.of(2026, 3, 15));
+            m1.setDifficultyRating(4);
+            m1.setStatus(MissionStatus.SUCCESS);
+            m1.setSpaceDeveloper(dev1);
+
+            var m2 = new Mission();
+            m2.setTitle("Debug the Quantum Entanglement Bug");
+            m2.setDescription("Traced a race condition that only appeared when observed.");
+            m2.setDate(LocalDate.of(2026, 2, 10));
+            m2.setDifficultyRating(5);
+            m2.setStatus(MissionStatus.CATASTROPHIC_FAILURE);
+            m2.setSpaceDeveloper(dev1);
+
+            var m3 = new Mission();
+            m3.setTitle("Migrate Star-CLI to Rust");
+            m3.setDescription("Rewriting the CLI for warp-speed performance.");
+            m3.setDate(LocalDate.of(2026, 4, 1));
+            m3.setDifficultyRating(3);
+            m3.setStatus(MissionStatus.IN_PROGRESS);
+            m3.setSpaceDeveloper(dev1);
+
+            var m4 = new Mission();
+            m4.setTitle("Pixel-perfect Landing Page");
+            m4.setDescription("Crafted a CSS animation that bends spacetime.");
+            m4.setDate(LocalDate.of(2026, 1, 20));
+            m4.setDifficultyRating(2);
+            m4.setStatus(MissionStatus.SUCCESS);
+            m4.setSpaceDeveloper(dev2);
+
+            var m5 = new Mission();
+            m5.setTitle("Void OS Kernel Patch");
+            m5.setDescription("Patched a zero-day exploit in the void-os kernel.");
+            m5.setDate(LocalDate.of(2026, 3, 28));
+            m5.setDifficultyRating(5);
+            m5.setStatus(MissionStatus.SUCCESS);
+            m5.setSpaceDeveloper(dev3);
+
+            var m6 = new Mission();
+            m6.setTitle("Train Quasar ML Model");
+            m6.setDescription("Training a model to predict asteroid trajectories.");
+            m6.setDate(LocalDate.of(2026, 4, 5));
+            m6.setDifficultyRating(4);
+            m6.setStatus(MissionStatus.IN_PROGRESS);
+            m6.setSpaceDeveloper(dev4);
+
+            missionRepo.saveAll(List.of(m1, m2, m3, m4, m5, m6));
         };
     }
 }

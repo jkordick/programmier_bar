@@ -5,9 +5,10 @@ interface DevCardProps {
   dev: SpaceDeveloper;
   onEdit: (dev: SpaceDeveloper) => void;
   onDelete: (id: number) => void;
+  onShowMissions: (dev: SpaceDeveloper) => void;
 }
 
-export default function DevCard({ dev, onEdit, onDelete }: DevCardProps) {
+export default function DevCard({ dev, onEdit, onDelete, onShowMissions }: DevCardProps) {
   const powerPercent = Math.min((dev.debuggingPowerLevel / 9001) * 100, 100);
 
   return (
@@ -93,6 +94,7 @@ export default function DevCard({ dev, onEdit, onDelete }: DevCardProps) {
 
       <div className="card-actions">
         <button className="btn" onClick={() => onEdit(dev)}>Edit</button>
+        <button className="btn" onClick={() => onShowMissions(dev)}>📜 Missions</button>
         <button className="btn btn-danger" onClick={() => dev.id && onDelete(dev.id)}>Deorbit</button>
       </div>
     </div>

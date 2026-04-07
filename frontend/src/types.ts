@@ -32,3 +32,26 @@ export const SENIORITY_LABELS: Record<Seniority, string> = {
   MASS_OF_AN_ASTEROID: '☄️ Mass of an Asteroid',
   MASS_OF_SPACE_DUST: '✨ Mass of Space Dust',
 };
+
+export type MissionStatus = 'SUCCESS' | 'CATASTROPHIC_FAILURE' | 'IN_PROGRESS';
+
+export interface Mission {
+  id?: number;
+  title: string;
+  description: string;
+  date: string;
+  difficultyRating: number;
+  status: MissionStatus;
+}
+
+export const MISSION_STATUS_LABELS: Record<MissionStatus, string> = {
+  SUCCESS: '✅ Success',
+  CATASTROPHIC_FAILURE: '💥 Catastrophic Failure',
+  IN_PROGRESS: '🔄 In Progress',
+};
+
+export const MISSION_STATUS_ICONS: Record<MissionStatus, string> = {
+  SUCCESS: '✅',
+  CATASTROPHIC_FAILURE: '💥',
+  IN_PROGRESS: '🔄',
+};
