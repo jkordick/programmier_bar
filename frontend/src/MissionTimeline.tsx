@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { Mission, MissionStatus } from './types';
 import { MISSION_STATUS_ICONS, MISSION_STATUS_LABELS } from './types';
 import { fetchMissions, createMission, deleteMission } from './api';
@@ -23,7 +23,7 @@ export default function MissionTimeline({ devId, callSign, onClose }: MissionTim
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<Mission>({ ...EMPTY_MISSION });
 
-  async function loadMissions() {
+  const loadMissions = useCallback(async () => {
     setLoading(true);
     try {
       const data = await fetchMissions(devId);
@@ -33,11 +33,11 @@ export default function MissionTimeline({ devId, callSign, onClose }: MissionTim
     } finally {
       setLoading(false);
     }
-  }
+  }, [devId]);
 
   useEffect(() => {
     loadMissions();
-  }, [devId]);
+  }, [loadMissions]);
 
   async function handleAddMission(e: React.FormEvent) {
     e.preventDefault();
