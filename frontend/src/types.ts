@@ -45,9 +45,9 @@ export interface Mission {
 }
 
 export const MISSION_STATUS_LABELS: Record<MissionStatus, string> = {
-  SUCCESS: '✅ Success',
-  CATASTROPHIC_FAILURE: '💥 Catastrophic Failure',
-  IN_PROGRESS: '🔄 In Progress',
+  SUCCESS: 'Success',
+  CATASTROPHIC_FAILURE: 'Catastrophic Failure',
+  IN_PROGRESS: 'In Progress',
 };
 
 export const MISSION_STATUS_ICONS: Record<MissionStatus, string> = {

@@ -146,7 +146,7 @@ export default function MissionTimeline({ devId, callSign, onClose }: MissionTim
         ) : (
           <div className="mission-timeline">
             {missions.map(mission => (
-              <div key={mission.id} className={`mission-entry mission-${mission.status.toLowerCase().replace('_', '-')}`}>
+              <div key={mission.id} className={`mission-entry mission-${mission.status.toLowerCase().replace(/_/g, '-')}`}>
                 <div className="mission-header">
                   <span className="mission-status-icon">{MISSION_STATUS_ICONS[mission.status]}</span>
                   <div className="mission-info">

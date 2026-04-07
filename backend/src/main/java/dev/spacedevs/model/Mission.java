@@ -25,9 +25,10 @@ public class Mission {
     @NotNull
     private LocalDate date;
 
+    @NotNull
     @Min(1)
     @Max(5)
-    private int difficultyRating;
+    private Integer difficultyRating;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -54,8 +55,8 @@ public class Mission {
     public LocalDate getDate() { return date; }
     public void setDate(LocalDate date) { this.date = date; }
 
-    public int getDifficultyRating() { return difficultyRating; }
-    public void setDifficultyRating(int difficultyRating) { this.difficultyRating = difficultyRating; }
+    public Integer getDifficultyRating() { return difficultyRating; }
+    public void setDifficultyRating(Integer difficultyRating) { this.difficultyRating = difficultyRating; }
 
     public MissionStatus getStatus() { return status; }
     public void setStatus(MissionStatus status) { this.status = status; }
