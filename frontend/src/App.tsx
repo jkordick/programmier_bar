@@ -3,12 +3,14 @@ import type { SpaceDeveloper } from './types';
 import { fetchDevs, createDev, updateDev, deleteDev, fetchRandomJoke } from './api';
 import DevCard from './DevCard';
 import DevForm from './DevForm';
+import MissionTimeline from './MissionTimeline';
 
 export default function App() {
   const [devs, setDevs] = useState<SpaceDeveloper[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<SpaceDeveloper | null>(null);
   const [creating, setCreating] = useState(false);
+  const [missionDev, setMissionDev] = useState<SpaceDeveloper | null>(null);
   const [joke, setJoke] = useState('Click to receive a transmission from the joke nebula...');
 
   const loadDevs = useCallback(async () => {
@@ -92,6 +94,7 @@ export default function App() {
               dev={dev}
               onEdit={setEditing}
               onDelete={handleDelete}
+              onShowMissions={setMissionDev}
             />
           ))}
         </div>
@@ -102,6 +105,13 @@ export default function App() {
       )}
       {editing && (
         <DevForm dev={editing} onSave={handleUpdate} onCancel={() => setEditing(null)} />
+      )}
+      {missionDev && missionDev.id && (
+        <MissionTimeline
+          devId={missionDev.id}
+          callSign={missionDev.callSign}
+          onClose={() => setMissionDev(null)}
+        />
       )}
     </>
   );

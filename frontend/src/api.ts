@@ -1,4 +1,4 @@
-import type { SpaceDeveloper } from './types';
+import type { SpaceDeveloper, Mission } from './types';
 
 const BASE = '/api/space-devs';
 
@@ -50,4 +50,25 @@ export async function generateJoke(callSign: string, skills: string): Promise<st
   const res = await fetch(`${BASE}/generate-joke?${params}`);
   if (!res.ok) throw new Error('Failed to generate joke');
   return res.text();
+}
+
+export async function fetchMissions(devId: number): Promise<Mission[]> {
+  const res = await fetch(`${BASE}/${devId}/missions`);
+  if (!res.ok) throw new Error('Failed to fetch missions');
+  return res.json();
+}
+
+export async function createMission(devId: number, mission: Mission): Promise<Mission> {
+  const res = await fetch(`${BASE}/${devId}/missions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(mission),
+  });
+  if (!res.ok) throw new Error('Failed to create mission');
+  return res.json();
+}
+
+export async function deleteMission(devId: number, missionId: number): Promise<void> {
+  const res = await fetch(`${BASE}/${devId}/missions/${missionId}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error('Failed to delete mission');
 }

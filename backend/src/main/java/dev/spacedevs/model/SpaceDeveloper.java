@@ -1,5 +1,6 @@
 package dev.spacedevs.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -61,6 +62,10 @@ public class SpaceDeveloper {
 
     private String shipName;
 
+    @OneToMany(mappedBy = "spaceDeveloper", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Mission> missions = new ArrayList<>();
+
     public SpaceDeveloper() {}
 
     // --- Getters and Setters ---
@@ -109,4 +114,7 @@ public class SpaceDeveloper {
 
     public String getShipName() { return shipName; }
     public void setShipName(String shipName) { this.shipName = shipName; }
+
+    public List<Mission> getMissions() { return missions; }
+    public void setMissions(List<Mission> missions) { this.missions = missions; }
 }
