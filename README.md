@@ -4,7 +4,9 @@
 > May contain traces of eggs, humor and examples
 
 ## Agentic SDLC scenarios
-### 1. PR Review
+### 1. PR review Agent
+### 2. Documentation update Agentic Workflow
+
 
 A demo project featuring a **Java Spring Boot** REST API and a **React + TypeScript** frontend with a space-themed UI.
 
