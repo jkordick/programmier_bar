@@ -59,6 +59,15 @@ App runs at **http://localhost:5173** (proxies `/api` to backend).
 | `DELETE` | `/api/space-devs/{id}`    | Deorbit a space dev       |
 | `GET`    | `/api/space-devs/search?callSign=...` | Search by call sign |
 | `GET`    | `/api/space-devs/random-joke`         | Random dev joke     |
+| `GET`    | `/api/space-devs/generate-joke?callSign=...&skills=...` | AI-generated dev joke |
+
+### Mission Endpoints
+
+| Method   | Endpoint                                        | Description                    |
+|----------|-------------------------------------------------|--------------------------------|
+| `GET`    | `/api/space-devs/{devId}/missions`              | List missions for a space dev  |
+| `POST`   | `/api/space-devs/{devId}/missions`              | Log a new mission              |
+| `DELETE` | `/api/space-devs/{devId}/missions/{missionId}`  | Abort (delete) a mission       |
 
 ## Developer Data Model
 
@@ -78,6 +87,23 @@ App runs at **http://localhost:5173** (proxies `/api` to backend).
 | `stackOverflowReputation`| int            | Internet clout |
 | `stillUsesVim`           | boolean        | Respect++ |
 | `shipName`               | String         | Your vessel |
+| `missions`               | List\<Mission\> | Mission log — because shipping code isn't enough |
+
+## Mission Data Model
+
+| Field              | Type          | Notes                                   |
+|--------------------|---------------|-----------------------------------------|
+| `title`            | String        | Name of the mission (required)          |
+| `description`      | String        | What went wrong (optional)              |
+| `date`             | LocalDate     | When the chaos unfolded (required)      |
+| `difficultyRating` | int (1–5)     | 1 = trivial, 5 = production on a Friday |
+| `status`           | Enum          | Current mission status                  |
+
+### Mission Status Values
+
+- 🟢 **SUCCESS** — Against all odds
+- 🔴 **CATASTROPHIC_FAILURE** — At least it was educational
+- 🟡 **IN_PROGRESS** — Hold your breath
 
 ## Seniority Levels (Gravitational Classes)
 
