@@ -18,7 +18,19 @@ A CRUD app for managing Space Developers — intergalactic coders with call sign
 
 ```
 backend/   — Spring Boot 3.4 + Java 21 + H2 in-memory DB
+  └── src/main/java/dev/spacedevs/
+        ├── controller/   — SpaceDeveloperController, MissionController
+        ├── model/        — SpaceDeveloper, Mission, Seniority, MissionStatus
+        ├── repository/   — JPA repositories
+        └── service/      — JokeGeneratorService
 frontend/  — Vite + React 19 + TypeScript
+  └── src/
+        ├── App.tsx             — main page, developer grid, CRUD
+        ├── DevCard.tsx         — individual developer card
+        ├── DevForm.tsx         — create/edit modal form
+        ├── MissionTimeline.tsx — mission history modal
+        ├── api.ts              — HTTP client
+        └── types.ts            — TypeScript interfaces & enums
 ```
 
 ## Prerequisites
@@ -59,6 +71,10 @@ App runs at **http://localhost:5173** (proxies `/api` to backend).
 | `DELETE` | `/api/space-devs/{id}`    | Deorbit a space dev       |
 | `GET`    | `/api/space-devs/search?callSign=...` | Search by call sign |
 | `GET`    | `/api/space-devs/random-joke`         | Random dev joke     |
+| `GET`    | `/api/space-devs/generate-joke?callSign=...&skills=...` | AI-generated joke for a dev |
+| `GET`    | `/api/space-devs/{devId}/missions`    | List missions for a dev  |
+| `POST`   | `/api/space-devs/{devId}/missions`    | Log a new mission        |
+| `DELETE` | `/api/space-devs/{devId}/missions/{missionId}` | Abort a mission |
 
 ## Developer Data Model
 
@@ -78,6 +94,23 @@ App runs at **http://localhost:5173** (proxies `/api` to backend).
 | `stackOverflowReputation`| int            | Internet clout |
 | `stillUsesVim`           | boolean        | Respect++ |
 | `shipName`               | String         | Your vessel |
+| `missions`               | List\<Mission\> | Field reports from the void |
+
+## Mission Data Model
+
+| Field              | Type          | Notes                      |
+|--------------------|---------------|----------------------------|
+| `title`            | String        | Mission name (required)    |
+| `description`      | String        | What went wrong (optional) |
+| `date`             | LocalDate     | When it happened           |
+| `difficultyRating` | int (1–5)     | 1 = routine, 5 = send help |
+| `status`           | MissionStatus | Current state of affairs   |
+
+## Mission Status Codes
+
+- 🟢 **SUCCESS** — Ship returned, coffee intact
+- 🔴 **CATASTROPHIC_FAILURE** — We don't talk about this one
+- 🟡 **IN_PROGRESS** — Fingers crossed
 
 ## Seniority Levels (Gravitational Classes)
 
