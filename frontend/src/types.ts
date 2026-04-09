@@ -33,6 +33,30 @@ export const SENIORITY_LABELS: Record<Seniority, string> = {
   MASS_OF_SPACE_DUST: '✨ Mass of Space Dust',
 };
 
+export const ALL_SENIORITIES: Seniority[] = [
+  'MASS_OF_THE_UNIVERSE',
+  'MASS_OF_A_STAR',
+  'MASS_OF_A_PLANET',
+  'MASS_OF_A_MOON',
+  'MASS_OF_AN_ASTEROID',
+  'MASS_OF_SPACE_DUST',
+];
+
+export type LeaderboardSortField =
+  | 'debuggingPowerLevel'
+  | 'coffeesPerDayInLiters'
+  | 'gitCommitStreak'
+  | 'stackOverflowReputation';
+
+export const SORT_FIELD_LABELS: Record<LeaderboardSortField, string> = {
+  debuggingPowerLevel: '🐛 Debugging Power',
+  coffeesPerDayInLiters: '☕ Coffee/Day (L)',
+  gitCommitStreak: '🔥 Git Streak',
+  stackOverflowReputation: '📊 SO Reputation',
+};
+
+export type SortOrder = 'asc' | 'desc';
+
 export type MissionStatus = 'SUCCESS' | 'CATASTROPHIC_FAILURE' | 'IN_PROGRESS';
 
 export interface Mission {

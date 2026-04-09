@@ -1,10 +1,26 @@
-import type { SpaceDeveloper, Mission } from './types';
+import type { SpaceDeveloper, Mission, LeaderboardSortField, SortOrder, Seniority } from './types';
 
 const BASE = '/api/space-devs';
 
 export async function fetchDevs(): Promise<SpaceDeveloper[]> {
   const res = await fetch(BASE);
   if (!res.ok) throw new Error('Failed to fetch developers');
+  return res.json();
+}
+
+export async function fetchLeaderboard(
+  sortBy: LeaderboardSortField,
+  order: SortOrder,
+  seniorities: Seniority[],
+  skill: string
+): Promise<SpaceDeveloper[]> {
+  const params = new URLSearchParams();
+  params.set('sortBy', sortBy);
+  params.set('order', order);
+  seniorities.forEach(s => params.append('seniority', s));
+  if (skill.trim()) params.set('skill', skill.trim());
+  const res = await fetch(`${BASE}?${params}`);
+  if (!res.ok) throw new Error('Failed to fetch leaderboard');
   return res.json();
 }
 
