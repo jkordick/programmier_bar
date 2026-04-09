@@ -2,7 +2,6 @@ package dev.spacedevs.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,6 @@ public class Crew {
     private String shipName;
 
     @OneToMany(mappedBy = "crew", fetch = FetchType.EAGER)
-    @Size(max = 6)
     private List<SpaceDeveloper> members = new ArrayList<>();
 
     public Crew() {}
