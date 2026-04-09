@@ -62,6 +62,11 @@ public class SpaceDeveloper {
 
     private String shipName;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "crew_id")
+    @JsonIgnore
+    private Crew crew;
+
     @OneToMany(mappedBy = "spaceDeveloper", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Mission> missions = new ArrayList<>();
@@ -117,4 +122,7 @@ public class SpaceDeveloper {
 
     public List<Mission> getMissions() { return missions; }
     public void setMissions(List<Mission> missions) { this.missions = missions; }
+
+    public Crew getCrew() { return crew; }
+    public void setCrew(Crew crew) { this.crew = crew; }
 }

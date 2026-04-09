@@ -1,9 +1,11 @@
 package dev.spacedevs.config;
 
+import dev.spacedevs.model.Crew;
 import dev.spacedevs.model.Mission;
 import dev.spacedevs.model.MissionStatus;
 import dev.spacedevs.model.Seniority;
 import dev.spacedevs.model.SpaceDeveloper;
+import dev.spacedevs.repository.CrewRepository;
 import dev.spacedevs.repository.MissionRepository;
 import dev.spacedevs.repository.SpaceDeveloperRepository;
 import org.springframework.boot.CommandLineRunner;
@@ -17,7 +19,7 @@ import java.util.List;
 public class DataSeeder {
 
     @Bean
-    CommandLineRunner seedData(SpaceDeveloperRepository repo, MissionRepository missionRepo) {
+    CommandLineRunner seedData(SpaceDeveloperRepository repo, MissionRepository missionRepo, CrewRepository crewRepo) {
         return args -> {
             var dev1 = new SpaceDeveloper();
             dev1.setCallSign("NebulaNinja");
@@ -247,6 +249,28 @@ public class DataSeeder {
             m6.setSpaceDeveloper(dev4);
 
             missionRepo.saveAll(List.of(m1, m2, m3, m4, m5, m6));
+
+            // Seed sample crews
+            var crew1 = new Crew();
+            crew1.setName("Nebula Knights");
+            crew1.setMissionStatement("Defend the codebase from cosmic bugs and deploy at lightspeed.");
+            crew1.setShipName("USS Refactor");
+            crewRepo.save(crew1);
+
+            dev1.setCrew(crew1);
+            dev2.setCrew(crew1);
+            dev6.setCrew(crew1);
+            repo.saveAll(List.of(dev1, dev2, dev6));
+
+            var crew2 = new Crew();
+            crew2.setName("Void Walkers");
+            crew2.setMissionStatement("Explore the darkest corners of legacy code and bring back clean abstractions.");
+            crew2.setShipName("The Garbage Collector");
+            crewRepo.save(crew2);
+
+            dev3.setCrew(crew2);
+            dev9.setCrew(crew2);
+            repo.saveAll(List.of(dev3, dev9));
         };
     }
 }

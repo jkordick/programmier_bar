@@ -16,6 +16,14 @@ export interface SpaceDeveloper {
   shipName: string;
 }
 
+export interface Crew {
+  id?: number;
+  name: string;
+  missionStatement: string;
+  shipName: string;
+  members: SpaceDeveloper[];
+}
+
 export type Seniority =
   | 'MASS_OF_THE_UNIVERSE'
   | 'MASS_OF_A_STAR'

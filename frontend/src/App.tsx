@@ -1,9 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { SpaceDeveloper } from './types';
-import { fetchDevs, createDev, updateDev, deleteDev, fetchRandomJoke } from './api';
+import type { SpaceDeveloper, Crew } from './types';
+import { fetchDevs, createDev, updateDev, deleteDev, fetchRandomJoke, fetchCrews, createCrew, deleteCrew, joinCrew, leaveCrew } from './api';
 import DevCard from './DevCard';
 import DevForm from './DevForm';
 import MissionTimeline from './MissionTimeline';
+import CrewList from './CrewList';
+import CrewDetail from './CrewDetail';
+import CrewForm from './CrewForm';
 
 export default function App() {
   const [devs, setDevs] = useState<SpaceDeveloper[]>([]);
@@ -12,6 +15,10 @@ export default function App() {
   const [creating, setCreating] = useState(false);
   const [missionDev, setMissionDev] = useState<SpaceDeveloper | null>(null);
   const [joke, setJoke] = useState('Click to receive a transmission from the joke nebula...');
+
+  const [crews, setCrews] = useState<Crew[]>([]);
+  const [selectedCrew, setSelectedCrew] = useState<Crew | null>(null);
+  const [creatingCrew, setCreatingCrew] = useState(false);
 
   const loadDevs = useCallback(async () => {
     setLoading(true);
@@ -25,9 +32,19 @@ export default function App() {
     }
   }, []);
 
+  const loadCrews = useCallback(async () => {
+    try {
+      const data = await fetchCrews();
+      setCrews(data);
+    } catch {
+      console.error('Failed to load crews');
+    }
+  }, []);
+
   useEffect(() => {
     loadDevs();
-  }, [loadDevs]);
+    loadCrews();
+  }, [loadDevs, loadCrews]);
 
   async function handleCreate(dev: SpaceDeveloper) {
     await createDev(dev);
@@ -46,6 +63,7 @@ export default function App() {
   async function handleDelete(id: number) {
     await deleteDev(id);
     loadDevs();
+    loadCrews();
   }
 
   async function handleJoke() {
@@ -54,6 +72,41 @@ export default function App() {
       setJoke(j);
     } catch {
       setJoke('The joke singularity collapsed. Try again.');
+    }
+  }
+
+  async function handleCreateCrew(crew: { name: string; missionStatement: string; shipName: string }) {
+    await createCrew(crew);
+    setCreatingCrew(false);
+    loadCrews();
+  }
+
+  async function handleDeleteCrew(id: number) {
+    await deleteCrew(id);
+    setSelectedCrew(null);
+    loadCrews();
+    loadDevs();
+  }
+
+  async function handleJoinCrew(crewId: number, devId: number) {
+    try {
+      const updated = await joinCrew(crewId, devId);
+      setSelectedCrew(updated);
+      loadCrews();
+      loadDevs();
+    } catch (err) {
+      console.error('Failed to join crew:', err);
+    }
+  }
+
+  async function handleLeaveCrew(crewId: number, devId: number) {
+    try {
+      const updated = await leaveCrew(crewId, devId);
+      setSelectedCrew(updated);
+      loadCrews();
+      loadDevs();
+    } catch (err) {
+      console.error('Failed to leave crew:', err);
     }
   }
 
@@ -111,6 +164,26 @@ export default function App() {
           devId={missionDev.id}
           callSign={missionDev.callSign}
           onClose={() => setMissionDev(null)}
+        />
+      )}
+
+      <CrewList
+        crews={crews}
+        onSelect={setSelectedCrew}
+        onCreate={() => setCreatingCrew(true)}
+      />
+
+      {creatingCrew && (
+        <CrewForm onSave={handleCreateCrew} onCancel={() => setCreatingCrew(false)} />
+      )}
+      {selectedCrew && (
+        <CrewDetail
+          crew={selectedCrew}
+          allDevs={devs}
+          onJoin={handleJoinCrew}
+          onLeave={handleLeaveCrew}
+          onDelete={handleDeleteCrew}
+          onClose={() => setSelectedCrew(null)}
         />
       )}
     </>
