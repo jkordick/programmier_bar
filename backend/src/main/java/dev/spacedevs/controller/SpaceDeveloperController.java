@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @RestController
@@ -56,7 +57,7 @@ public class SpaceDeveloperController {
                             return null;
                         }
                     })
-                    .filter(s -> s != null)
+                    .filter(Objects::nonNull)
                     .toList();
             if (!seniorityEnums.isEmpty()) {
                 spec = spec.and((root, query, cb) -> root.get("seniority").in(seniorityEnums));
