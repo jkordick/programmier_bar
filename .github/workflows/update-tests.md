@@ -10,7 +10,7 @@ network:
   allowed: [defaults, java, node]
 tools:
   github:
-    toolsets: [default]
+    toolsets: [repos, pull_requests, search]
   playwright:
 safe-outputs:
   create-pull-request:

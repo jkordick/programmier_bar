@@ -23,7 +23,7 @@
 #
 # Keeps comprehensive unit/integration tests (backend) and Playwright E2E tests (frontend) up to date whenever code is pushed or merged to main.
 #
-# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"9cb3c5f84c251d86d956af7fa841fb04c40024dbf29317c9aa5b50725e13f518","compiler_version":"v0.47.2"}
+# gh-aw-metadata: {"schema_version":"v1","frontmatter_hash":"01981957bdccce99eac3e886effc08aee5596768de2d803f460c6ed976d87a28","compiler_version":"v0.47.2"}
 
 name: "Update Tests"
 "on":
@@ -232,7 +232,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      issues: read
       pull-requests: read
     env:
       DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
@@ -626,7 +625,7 @@ jobs:
                   "GITHUB_LOCKDOWN_MODE": "$GITHUB_MCP_LOCKDOWN",
                   "GITHUB_PERSONAL_ACCESS_TOKEN": "\${GITHUB_MCP_SERVER_TOKEN}",
                   "GITHUB_READ_ONLY": "1",
-                  "GITHUB_TOOLSETS": "context,repos,issues,pull_requests"
+                  "GITHUB_TOOLSETS": "repos,pull_requests,search"
                 }
               },
               "playwright": {
