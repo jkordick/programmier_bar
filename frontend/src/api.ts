@@ -52,6 +52,16 @@ export async function generateJoke(callSign: string, skills: string): Promise<st
   return res.text();
 }
 
+export async function generateCallSign(skills: string[], seniority: string): Promise<string> {
+  const res = await fetch(`${BASE}/generate-call-sign`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ skills, seniority }),
+  });
+  if (!res.ok) throw new Error('Failed to generate call sign');
+  return res.text();
+}
+
 export async function fetchMissions(devId: number): Promise<Mission[]> {
   const res = await fetch(`${BASE}/${devId}/missions`);
   if (!res.ok) throw new Error('Failed to fetch missions');

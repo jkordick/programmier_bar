@@ -23,7 +23,7 @@ public class JokeGeneratorService {
             var session = client.createSession(
                 new SessionConfig()
                     .setOnPermissionRequest(PermissionHandler.APPROVE_ALL)
-                    .setModel("gpt-4o-mini")
+                    .setModel("gpt-4.1")
             ).get();
 
             session.on(AssistantMessageEvent.class, msg -> {

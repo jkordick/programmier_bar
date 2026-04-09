@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { SpaceDeveloper, Seniority } from './types';
 import { SENIORITY_LABELS } from './types';
-import { generateJoke } from './api';
+import { generateJoke, generateCallSign } from './api';
 
 const EMPTY_DEV: SpaceDeveloper = {
   callSign: '',
@@ -31,6 +31,7 @@ export default function DevForm({ dev, onSave, onCancel }: DevFormProps) {
   const [skillsInput, setSkillsInput] = useState(form.skills.join(', '));
   const [ossInput, setOssInput] = useState(form.ossProjects.join(', '));
   const [generatingJoke, setGeneratingJoke] = useState(false);
+  const [generatingCallSign, setGeneratingCallSign] = useState(false);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -55,6 +56,26 @@ export default function DevForm({ dev, onSave, onCancel }: DevFormProps) {
                 onChange={e => setForm({ ...form, callSign: e.target.value })}
                 placeholder="NebulaNinja"
               />
+              <button
+                type="button"
+                className="btn"
+                disabled={generatingCallSign}
+                style={{ marginTop: '0.5rem', width: '100%' }}
+                onClick={async () => {
+                  setGeneratingCallSign(true);
+                  try {
+                    const skills = skillsInput.split(',').map(s => s.trim()).filter(Boolean);
+                    const callSign = await generateCallSign(skills, form.seniority);
+                    setForm(f => ({ ...f, callSign }));
+                  } catch {
+                    // silently keep current value
+                  } finally {
+                    setGeneratingCallSign(false);
+                  }
+                }}
+              >
+                {generatingCallSign ? '🛸 Generating...' : '🎲 Generate Call Sign'}
+              </button>
             </div>
             <div className="form-group">
               <label>Real Name *</label>

@@ -2,6 +2,7 @@ package dev.spacedevs.controller;
 
 import dev.spacedevs.model.SpaceDeveloper;
 import dev.spacedevs.repository.SpaceDeveloperRepository;
+import dev.spacedevs.service.CallSignGeneratorService;
 import dev.spacedevs.service.JokeGeneratorService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -17,10 +18,14 @@ public class SpaceDeveloperController {
 
     private final SpaceDeveloperRepository repository;
     private final JokeGeneratorService jokeGenerator;
+    private final CallSignGeneratorService callSignGenerator;
 
-    public SpaceDeveloperController(SpaceDeveloperRepository repository, JokeGeneratorService jokeGenerator) {
+    public SpaceDeveloperController(SpaceDeveloperRepository repository,
+                                    JokeGeneratorService jokeGenerator,
+                                    CallSignGeneratorService callSignGenerator) {
         this.repository = repository;
         this.jokeGenerator = jokeGenerator;
+        this.callSignGenerator = callSignGenerator;
     }
 
     @GetMapping
@@ -83,4 +88,12 @@ public class SpaceDeveloperController {
         String joke = jokeGenerator.generateJoke(callSign, skills);
         return ResponseEntity.ok(joke);
     }
+
+    @PostMapping("/generate-call-sign")
+    public ResponseEntity<String> generateCallSign(@RequestBody CallSignRequest request) {
+        String callSign = callSignGenerator.generateCallSign(request.skills(), request.seniority());
+        return ResponseEntity.ok(callSign);
+    }
+
+    public record CallSignRequest(List<String> skills, String seniority) {}
 }

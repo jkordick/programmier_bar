@@ -6,7 +6,9 @@
 ### 1. Documentation update Agentic Workflow
 ### 2. Test generation Agentic Workflow
 ### 3. Feature implementation from issue
+### 4. Spec-driven
 ### 4. PR review Agent
+
 
 # 🚀 Space Devs — Intergalactic Developer Registry
 
