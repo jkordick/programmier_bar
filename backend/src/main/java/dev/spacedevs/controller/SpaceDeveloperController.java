@@ -1,19 +1,28 @@
 package dev.spacedevs.controller;
 
+import dev.spacedevs.model.Seniority;
 import dev.spacedevs.model.SpaceDeveloper;
 import dev.spacedevs.repository.SpaceDeveloperRepository;
 import dev.spacedevs.service.JokeGeneratorService;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/space-devs")
 @CrossOrigin(origins = "http://localhost:5173")
 public class SpaceDeveloperController {
+
+    private static final Set<String> SORTABLE_FIELDS = Set.of(
+            "debuggingPowerLevel", "coffeesPerDayInLiters", "gitCommitStreak", "stackOverflowReputation"
+    );
 
     private final SpaceDeveloperRepository repository;
     private final JokeGeneratorService jokeGenerator;
@@ -24,8 +33,50 @@ public class SpaceDeveloperController {
     }
 
     @GetMapping
-    public List<SpaceDeveloper> getAll() {
-        return repository.findAll();
+    public List<SpaceDeveloper> getAll(
+            @RequestParam(required = false) String sortBy,
+            @RequestParam(required = false, defaultValue = "desc") String order,
+            @RequestParam(required = false) List<String> seniority,
+            @RequestParam(required = false) String skill) {
+
+        boolean hasFilters = sortBy != null || (seniority != null && !seniority.isEmpty()) || (skill != null && !skill.isBlank());
+
+        if (!hasFilters) {
+            return repository.findAll();
+        }
+
+        Specification<SpaceDeveloper> spec = Specification.where(null);
+
+        if (seniority != null && !seniority.isEmpty()) {
+            List<Seniority> seniorityEnums = seniority.stream()
+                    .map(s -> {
+                        try {
+                            return Seniority.valueOf(s);
+                        } catch (IllegalArgumentException e) {
+                            return null;
+                        }
+                    })
+                    .filter(s -> s != null)
+                    .toList();
+            if (!seniorityEnums.isEmpty()) {
+                spec = spec.and((root, query, cb) -> root.get("seniority").in(seniorityEnums));
+            }
+        }
+
+        if (skill != null && !skill.isBlank()) {
+            spec = spec.and((root, query, cb) -> {
+                var skillJoin = root.join("skills", JoinType.INNER);
+                query.distinct(true);
+                return cb.like(cb.lower(skillJoin.as(String.class)), "%" + skill.toLowerCase() + "%");
+            });
+        }
+
+        Sort sort = Sort.unsorted();
+        if (sortBy != null && SORTABLE_FIELDS.contains(sortBy)) {
+            sort = "asc".equalsIgnoreCase(order) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        }
+
+        return repository.findAll(spec, sort);
     }
 
     @GetMapping("/{id}")
