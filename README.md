@@ -24,7 +24,8 @@ backend/   — Spring Boot 3.4 + Java 21 + H2 in-memory DB
         ├── controller/   — SpaceDeveloperController, MissionController
         ├── model/        — SpaceDeveloper, Mission, Seniority, MissionStatus
         ├── repository/   — JPA repositories
-        └── service/      — JokeGeneratorService
+        ├── service/      — JokeGeneratorService
+        └── config/       — DataSeeder (pre-populates dev data on startup)
 frontend/  — Vite + React 19 + TypeScript
   └── src/
         ├── App.tsx             — main page, developer grid, CRUD
