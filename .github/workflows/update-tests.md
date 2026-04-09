@@ -6,7 +6,6 @@ on:
 permissions:
   contents: read
   pull-requests: read
-  issues: read
 network:
   allowed: [defaults, java, node]
 tools:
@@ -126,3 +125,5 @@ If you wrote or updated tests, create a pull request with:
 - Title describing what test coverage was added (e.g. `test: add SpaceDeveloperController tests`)
 - Body listing the new test classes/methods and what they cover
 - Branch name: `test/update-tests`
+
+**Important:** Do NOT create a GitHub issue as a fallback. If PR creation fails, push the branch and stop — do not open an issue describing the changes.
