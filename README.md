@@ -1,12 +1,14 @@
-# 🚀 Space Devs — Intergalactic Developer Registry
+# Agentic SDLC demo repository
 
 > Repository initially created by Julia Kordick for the programmier.bar meetup on 2026-04-09
 > May contain traces of eggs, humor and examples
 
-## Agentic SDLC scenarios
-### 1. PR review Agent
-### 2. Documentation update Agentic Workflow
+### 1. Documentation update Agentic Workflow
+### 2. Test generation Agentic Workflow
+### 3. Feature implementation from issue
+### 4. PR review Agent
 
+# 🚀 Space Devs — Intergalactic Developer Registry
 
 A demo project featuring a **Java Spring Boot** REST API and a **React + TypeScript** frontend with a space-themed UI.
 
