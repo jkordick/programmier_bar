@@ -47,7 +47,7 @@ frontend/  — Vite + React 19 + TypeScript
 
 ```bash
 cd backend
-./mvnw spring-boot:run    # or: mvn spring-boot:run
+mvn spring-boot:run
 ```
 
 API runs at **http://localhost:8080**. H2 console at **http://localhost:8080/h2-console**.
