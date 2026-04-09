@@ -1,6 +1,7 @@
-import type { SpaceDeveloper, Mission } from './types';
+import type { SpaceDeveloper, Mission, Crew } from './types';
 
 const BASE = '/api/space-devs';
+const CREWS_BASE = '/api/crews';
 
 export async function fetchDevs(): Promise<SpaceDeveloper[]> {
   const res = await fetch(BASE);
@@ -71,4 +72,58 @@ export async function createMission(devId: number, mission: Mission): Promise<Mi
 export async function deleteMission(devId: number, missionId: number): Promise<void> {
   const res = await fetch(`${BASE}/${devId}/missions/${missionId}`, { method: 'DELETE' });
   if (!res.ok) throw new Error('Failed to delete mission');
+}
+
+// --- Crew API ---
+
+export async function fetchCrews(): Promise<Crew[]> {
+  const res = await fetch(CREWS_BASE);
+  if (!res.ok) throw new Error('Failed to fetch crews');
+  return res.json();
+}
+
+export async function fetchCrew(id: number): Promise<Crew> {
+  const res = await fetch(`${CREWS_BASE}/${id}`);
+  if (!res.ok) throw new Error('Crew not found');
+  return res.json();
+}
+
+export async function createCrew(crew: Omit<Crew, 'id' | 'members'>): Promise<Crew> {
+  const res = await fetch(CREWS_BASE, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(crew),
+  });
+  if (!res.ok) throw new Error('Failed to create crew');
+  return res.json();
+}
+
+export async function updateCrew(id: number, crew: Omit<Crew, 'id' | 'members'>): Promise<Crew> {
+  const res = await fetch(`${CREWS_BASE}/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(crew),
+  });
+  if (!res.ok) throw new Error('Failed to update crew');
+  return res.json();
+}
+
+export async function deleteCrew(id: number): Promise<void> {
+  const res = await fetch(`${CREWS_BASE}/${id}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error('Failed to delete crew');
+}
+
+export async function joinCrew(crewId: number, devId: number): Promise<Crew> {
+  const res = await fetch(`${CREWS_BASE}/${crewId}/members/${devId}`, { method: 'POST' });
+  if (!res.ok) {
+    if (res.status === 409) throw new Error('Developer is already in a crew or crew is full');
+    throw new Error('Failed to join crew');
+  }
+  return res.json();
+}
+
+export async function leaveCrew(crewId: number, devId: number): Promise<Crew> {
+  const res = await fetch(`${CREWS_BASE}/${crewId}/members/${devId}`, { method: 'DELETE' });
+  if (!res.ok) throw new Error('Failed to leave crew');
+  return res.json();
 }
